@@ -1,0 +1,54 @@
+#!/bin/sh
+/*/. 2>/dev/null; exec "$(dirname "$0")"/ImageJ.sh "$0" "$@" # exec with fiji */
+
+/*
+ * This script helps to identify the plugins that depend directly or
+ * indirectly on mpicbg.jar.
+ */
+
+import fiji.updater.logic.Dependency;
+import fiji.updater.logic.PluginCollection;
+import fiji.updater.logic.PluginObject;
+import fiji.updater.logic.XMLFileReader;
+
+import java.io.FileInputStream;
+
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import java.util.zip.GZIPInputStream;
+
+// Read the database
+
+ijDir = System.getProperty("ij.dir");
+dbPath = ijDir + "/db.xml.gz";
+plugins = new PluginCollection();
+new XMLFileReader(plugins).read(null, new GZIPInputStream(new FileInputStream(dbPath)), 0);
+
+dependencees = new TreeMap();
+
+for (PluginObject plugin : plugins)
+	for (Dependency dependency : plugin.getDependencies()) {
+		list = dependencees.get(dependency.filename);
+		if (list == null) {
+			list = new TreeSet();
+			dependencees.put(dependency.filename, list);
+		}
+		list.add(plugin.filename);
+	}
+
+deps = new TreeSet();
+
+addDependencee(filename) {
+	if (deps.contains(filename))
+		return;
+	deps.add(filename);
+	list = dependencees.get(filename);
+	if (list != null)
+		for (String dep : list)
+			addDependencee(dep);
+}
+
+addDependencee(bsh.args.length == 1 ? bsh.args[0] : "jars/mpicbg.jar");
+
+print(deps);

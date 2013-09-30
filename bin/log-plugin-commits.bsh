@@ -1,0 +1,69 @@
+#!/bin/sh
+/*/. 2>/dev/null; exec "$(dirname "$0")"/ImageJ.sh "$0" "$@" # exec with fiji */
+
+/*
+ * This script helps to identify the commits performed on plugins since they
+ * were uploaded last time.
+ */
+
+import fiji.scripting.FileFunctions;
+import fiji.scripting.LogComponentCommits;
+
+usage() {
+	usage(null);
+}
+
+usage(message) {
+	if (message != null)
+		System.err.println(message);
+	System.err.println("Usage: " + this.interpreter.getSourceFileInfo()
+		+ " [--fuzz minutes-before]"
+		+ " <file.jar> [<file2.jar> ...]");
+	System.exit(1);
+}
+
+fuzz = 0;
+verbose = 0;
+gui = false;
+color = false;
+extraArgs = new ArrayList();
+
+while (bsh.args.length > 0 && bsh.args[0].startsWith("-")) {
+	handled = 1;
+	if (bsh.args[0].equals("--fuzz")) {
+		if (bsh.args.length < 2)
+			usage("--fuzz needs a number of minutes");
+		fuzz = Integer.parseInt(bsh.args[1]);
+		handled = 2;
+	}
+	else if (bsh.args[0].equals("-p") || bsh.args[0].equals("--color")) {
+		if (bsh.args[0].equals("--color"))
+			color = true;
+		extraArgs.add(bsh.args[0]);
+		if (bsh.args[0].equals("-p")) {
+			extraArgs.add("-M");
+			extraArgs.add("--ignore-space-at-eol");
+		}
+	}
+	else if (bsh.args[0].equals("-v") || bsh.args[0].equals("--verbose"))
+		verbose++;
+	else if (bsh.args[0].equals("--gui"))
+		gui = true;
+	else
+		usage("Unknown option: '" + bsh.args[0] + "'");
+
+	args = new String[bsh.args.length - handled];
+	if (args.length > 0)
+		System.arraycopy(bsh.args, handled, args, 0, args.length);
+	bsh.args = args;
+}
+
+if (bsh.args.length == 0)
+	usage();
+
+if (gui) {
+	f = new FileFunctions(null);
+	for (String component : bsh.args)
+		f.showPluginChangesSinceUpload(component);
+} else
+	new LogComponentCommits(verbose, fuzz, color, System.out, System.err, extraArgs).showChanges(bsh.args);

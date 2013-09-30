@@ -1,0 +1,12 @@
+Development of AnnotationRoi3D ImageJ plug-in with Eclipse:
+
+Requirements:
+ - Eclipse IDE with Mavern installed
+ - Java Virtual Machine v4 or later
+
+1) Clone Github fiji repository to local drive.
+2) Open Eclipse and choose workspace as /fiji/src-plugins folder.
+3) Go to File -> Import -> Mavern -> Existing Mavern Projects choose the /fiji/src-plugins folder as the root directory and click next. All the fiji plug-ins should now appear in the Project Explorer.
+4) In the file explorer navigatate to /fiji/src-plugins/Annotation_ROI_3D directory and add ij.jar file, the ij.jar file can be found by downloading any version of ImageJ from the github page or ImageJ website.
+5) In Eclipse Project Explorer select Annotation_ROI_3D right click and select build path and configure build path, select the libraries tab and 'add external jars button', then select the ij.jar located in the 'AnnotationRoi3D' folder.
+6)Finally to run the plug-in select the Annotation_ROI_3D.java file in the Eclipse project explorer and click run as Java Application. This should launch ImageJ with the plug-in opened for testing.

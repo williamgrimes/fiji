@@ -1,0 +1,11 @@
+/ImageJ-*
+!/fiji-*.copyright
+!/fiji-*.README.Debian
+*.log
+*.pyc
+/ImageJ
+*.substvars
+*.debhelper
+/files
+/db.xml
+/db.xml.gz
